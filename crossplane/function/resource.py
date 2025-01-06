@@ -38,7 +38,10 @@ def update(r: fnv1.Resource, source: dict | structpb.Struct | pydantic.BaseModel
     """
     match source:
         case pydantic.BaseModel():
-            r.resource.update(source.model_dump(exclude_defaults=True, warnings=False))
+            data = source.model_dump(exclude_defaults=True, warnings=False)
+            data['apiVersion'] = source.apiVersion
+            data['kind'] = source.kind
+            r.resource.update(data)
         case structpb.Struct():
             # TODO(negz): Use struct_to_dict and update to match other semantics?
             r.resource.MergeFrom(source)
